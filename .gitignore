@@ -1,0 +1,9 @@
+/bochs.txt
+/bootblock
+/disk.img
+/text
+/flags
+/kernel
+/linker.ld
+/*.o
+/protected.*
