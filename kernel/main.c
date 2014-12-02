@@ -11,7 +11,7 @@ typedef struct gdt_descriptor_t {
 	uint16_t flag;
 } gdt_descriptor_t;
 
-typedef struct __attribute__ ((__packed__)) gdt_reg {
+typedef struct __attribute__ ((packed)) gdt_reg {
 	uint16_t size;
 	uint32_t offset;
 } gdt_reg;
@@ -33,9 +33,9 @@ const int GDT_ENTRIES_NUM = 3;
 
 gdt_descriptor_t gdt_structs[] = {
 	{0,0,0},
-	{0x0, 0x3FF, 0x409A},
-	{0x400, 0x7FF, 0x4092},
-	{0xC00, 0x7FF, 0x4096}
+	{0x0, 0xFFFFF, 0xC09A},
+	{0x0, 0xFFFFF, 0xC092},
+	//{0x0, 0xFFFFF, 0xC096}
 };
 
 void main32();
@@ -48,19 +48,22 @@ int main() {
 	}
 
 	//LOAD GDT HERE
-	gdt_register.size = GDT_ENTRIES_NUM;
-	gdt_register.offset = (uint16_t)gdt;
-	enter_protected_mode(&gdt_register);
-	/*asm volatile (" \
+	gdt_register.size = GDT_ENTRIES_NUM<<3;
+	long *x = (long*)((long)&gdt_register+2);
+	*x = (long)&gdt;
+	//gdt_register.offset = (long)(&gdt);
+	//enter_protected_mode(&gdt_register);
+	asm volatile (" \
 		lgdt %0; \
-		movl %cr0, %eax; \
-		orl $1, %eax; \
-		movl %eax, %cr0; \
-		jmpf 0x8:.next; \
+		movl %%cr0, %%eax; \
+		orl $1, %%eax; \
+		movl %%eax, %%cr0; \
+		jmpl $0x8, $.next; \
 	.next: \
-		.code16; \
-		call main32;"
+		.code32; \
+		call main32; \
+"
 	:
-	: "p" (&gdt_register));*/
+	:"m" (gdt_register));
 	return 0;
 } 
