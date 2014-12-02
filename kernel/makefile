@@ -1,14 +1,12 @@
-kernel: start.o protected.o main.o main32.o
+kernel: start.o main.o main32.o
 	ld -melf_i386 --oformat=binary -Tlinker.ld -o $@ $^
+	cp kernel ../text
 
 main.o: main.c
 	gcc -m32 -nostdlib -nodefaultlibs -nostartfiles -c -o $@ $<
 
 main32.o: main32.c
 	gcc -m32 -nostdlib -nodefaultlibs -nostartfiles -c -o $@ $<
-
-protected.o: protected.asm main32.o
-	nasm -f elf -o $@ $<
 
 start.o: start.asm
 	nasm -f elf -o $@ $<
