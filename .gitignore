@@ -1,9 +1,8 @@
 /bochs.txt
 /bootblock
 /disk.img
-/texn
+/text
 /kernel/flags
 /kernel/kernel
-/kernel/linker.ld
 /kernel/*.o
 /kernel/protected.*
