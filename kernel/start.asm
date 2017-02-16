@@ -4,4 +4,3 @@ extern main
 
 _start:
 	call main
-
