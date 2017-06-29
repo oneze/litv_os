@@ -48,12 +48,13 @@ int main() {
 	}
 
 	//LOAD GDT HERE
-	gdt_register.size = GDT_ENTRIES_NUM<<3;
+	gdt_register.size = (GDT_ENTRIES_NUM<<3) - 1;
 	long *x = (long*)((long)&gdt_register+2);
 	*x = (long)&gdt;
 	//gdt_register.offset = (long)(&gdt);
 	//enter_protected_mode(&gdt_register);
 	asm volatile (" \
+		cli; \
 		lgdt %0; \
 		movl %%cr0, %%eax; \
 		orl $1, %%eax; \
@@ -61,9 +62,13 @@ int main() {
 		jmpl $0x8, $.next; \
 	.next: \
 		.code32; \
-		call main32; \
+		movw $0x10, %%ax; \
+		movw %%ax, %%ss; \
+		movw %%ax, %%ds; \
 "
 	:
 	:"m" (gdt_register));
+	main32();
+	while(1){};
 	return 0;
-} 
+}
